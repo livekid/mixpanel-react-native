@@ -1,8 +1,8 @@
 {
     "name": "mixpanel-react-native",
-    "version": "1.0.0-beta.5",
+    "version": "1.0.0-beta.5+Convenience-Flavour",
     "description": "Mixpanel tracking library for react-native",
-    "main": "index.js",
+    "main": "index.tsx",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
