@@ -1,7 +1,7 @@
 /* -------------------- DevicePlatform -------------------- */
 const DevicePlatform = {
-    Unknown: "Unknown",
-    Android: "Android",
+    Unknown: "unknown",
+    Android: "android",
     iOS: "ios"
 }
 

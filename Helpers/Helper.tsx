@@ -17,7 +17,7 @@ export default class Helper {
      */
     static getDevicePlatform(): string {
         switch (Platform.OS) {
-            case "Android":
+            case "android":
                 return DevicePlatform.Android;
             case "ios":
                 return DevicePlatform.iOS;
