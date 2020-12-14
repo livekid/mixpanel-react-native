@@ -21,8 +21,8 @@ if (!MixpanelReactNative) {
 const DEFAULT_OPT_OUT = false;
 
 interface OptionsModel {
-    distinctId: string
-    properties: any
+    distinctId?: string
+    properties?: Map<string, string> | {}
 } 
 
 export default class Mixpanel {
@@ -73,7 +73,7 @@ export default class Mixpanel {
           }
       }
      */
-    optInTracking(options: OptionsModel): void {
+    optInTracking(options?: OptionsModel): void {
         options = options || { distinctId: null, properties: {} };
 
         if (!StringHelper.isValidOrUndefined(options.distinctId)) {
@@ -125,7 +125,7 @@ export default class Mixpanel {
     /**
       Track an event.
      */
-    track(eventName: string, properties: any): void {
+    track(eventName: string, properties?: {} | Map<string, string>): void {
         if (!StringHelper.isValid(eventName)) {
             StringHelper.raiseError(PARAMS.EVENT_NAME);
         }
@@ -141,7 +141,7 @@ export default class Mixpanel {
       Register a set of super properties, which are included with all
       events. This will overwrite previous super property values.
      */
-    registerSuperProperties(properties: any): void {
+    registerSuperProperties(properties?: {} |  Map<string, string>): void {
         if (!ObjectHelper.isValidOrUndefined(properties)) {
             ObjectHelper.raiseError(PARAMS.PROPERTIES);
         }
@@ -153,7 +153,7 @@ export default class Mixpanel {
       Register a set of super properties only once. This will not
       overwrite previous super property values, unlike register().
      */
-    registerSuperPropertiesOnce(properties: any): void {
+    registerSuperPropertiesOnce(properties:  {} | Map<string, string>): void {
         if (!ObjectHelper.isValidOrUndefined(properties)) {
             ObjectHelper.raiseError(PARAMS.PROPERTIES);
         }
@@ -268,40 +268,46 @@ export class People {
     /**
       Set properties on an user record in engage.
      */
-    set(prop: any | string, to: any) {
+
+    set(prop: {} | Map<string, string> | string, to?: string) {
         let properties = {};
-        if (ObjectHelper.isValid(prop)) {
-            properties = JSON.parse(JSON.stringify(prop || {}));
-        } else {
-            if (!StringHelper.isValid(prop)) {
-                StringHelper.raiseError(PARAMS.PROP);
-            }
+
+        if (typeof prop == 'object') {
+            if (ObjectHelper.isValid(prop)) properties = JSON.parse(JSON.stringify(prop || {}));
+        }
+
+        if (typeof prop == 'string') {
+            if (!StringHelper.isValid(prop)) StringHelper.raiseError(PARAMS.PROP);
             properties[prop] = to;
         }
+
         return MixpanelReactNative.set(this.token, properties);
     }
 
     /**
       The same as people.set but This method allows you to set a user attribute, only if it is not currently set.
      */
-    setOnce(prop: any | string, to: any) {
+    setOnce(prop: {} | Map<string, string> | string, to?: {}) {
         let properties = {};
-        if (ObjectHelper.isValid(prop)) {
+      
+        if (typeof prop == 'object') {
             prop = prop || {};
             properties = JSON.parse(JSON.stringify(prop));
-        } else {
-            if (!StringHelper.isValid(prop)) {
-                StringHelper.raiseError(PARAMS.PROP);
-            }
+        } 
+
+        if (typeof prop == 'string') {
+            if (!StringHelper.isValid(prop)) StringHelper.raiseError(PARAMS.PROP);
             properties[prop] = to;
         }
+
+
         return MixpanelReactNative.setOnce(this.token, properties);
     }
 
     /**
       Track a revenue transaction for the identified people profile.
      */
-    trackCharge(charge: number, properties: any) {
+    trackCharge(charge: number, properties?: {}) {
         if (isNaN(charge)) { // TODO: Check f it works that way
             throw new Error(`${PARAMS.CHARGE}${ERROR_MESSAGE.REQUIRED_DOUBLE}`)
         }
@@ -322,9 +328,10 @@ export class People {
     /**
       Increment/Decrement properties on an user record in engage.
      */
-    increment(prop: string, by: number) {
+    increment(prop: Map<string, number>  | string, by?: number) {
         var add = {};
-        if (ObjectHelper.isValid(prop)) {
+
+        if (typeof prop == 'object' && ObjectHelper.isValid(prop)) {
             Object.keys(prop).forEach(function (key) {
                 var val = prop[key];
                 if (isNaN(parseFloat(val))) {
@@ -332,9 +339,11 @@ export class People {
                 }
                 add[key] = val;
             });
-        } else {
+        }
+
+        if (typeof prop == 'string') {
             by = by || 1;
-            if (isNaN(by)) { // TODO: Check f it works that way
+            if (by == undefined || isNaN(by)) {
                 throw new Error(`${PARAMS.PROPERTY_VALUE}${ERROR_MESSAGE.REQUIRED_DOUBLE}`);
             }
 
@@ -344,13 +353,14 @@ export class People {
 
             add[prop] = by;
         }
+
         return MixpanelReactNative.increment(this.token, add);
     }
 
     /**
       Append a value to a list-valued people analytics property.
      */
-    append(name: string, value: any): void {
+    append(name: string, value: string | number): void {
         let appendProp = {};
         if (!StringHelper.isValid(name)) {
             StringHelper.raiseError(PARAMS.NAME);
