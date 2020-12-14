@@ -1,5 +1,5 @@
 import packageJson from "../package.json";
-import DevicePlatform from '../DEvicePlatform'
+import DevicePlatform from '../DevicePlatform'
 import { Platform } from "react-native"
 
 export default class Helper {
